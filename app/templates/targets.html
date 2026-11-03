@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="form-page-heading"><p class="section-eyebrow mb-1">Daily goals</p><h1 class="page-title">Nutrition targets</h1></div>
+<form method="post" action="{{ url_for('update_targets') }}" class="app-form-card row g-3">
+  {% set v = targets if targets else {} %}
+  <div class="col-md-6"><label class="form-label" for="calorie_target">Calories (kcal)</label><input class="form-control app-control{% if errors.calorie_target %} is-invalid{% endif %}" id="calorie_target" name="calorie_target" value="{{ v.calorie_target or '' }}" {% if errors.calorie_target %}aria-invalid="true" aria-describedby="calorie_target_error"{% endif %}>{% if errors.calorie_target %}<div class="invalid-feedback" id="calorie_target_error">{{ errors.calorie_target }}</div>{% endif %}</div>
+  <div class="col-md-6"><label class="form-label" for="protein_target">Protein (g)</label><input class="form-control app-control{% if errors.protein_target %} is-invalid{% endif %}" id="protein_target" name="protein_target" value="{{ v.protein_target or '' }}" {% if errors.protein_target %}aria-invalid="true" aria-describedby="protein_target_error"{% endif %}>{% if errors.protein_target %}<div class="invalid-feedback" id="protein_target_error">{{ errors.protein_target }}</div>{% endif %}</div>
+  <div class="col-12 form-actions"><button class="btn app-btn-primary">Save targets</button><a class="btn app-btn-secondary" href="{{ url_for('dashboard') }}">Cancel</a></div>
+</form>
+{% endblock %}

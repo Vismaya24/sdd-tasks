@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="form-page-heading"><p class="section-eyebrow mb-1">Meal details</p><h1 class="page-title">{% if meal %}Edit meal{% else %}Add meal{% endif %}</h1></div>
+<form method="post" action="{% if meal %}{{ url_for('update_meal_route', meal_id=meal.id) }}{% else %}{{ url_for('create_meal') }}{% endif %}" class="app-form-card row g-3">
+  {% set v = values %}
+  <div class="col-md-6">
+    <label class="form-label" for="food_name">Food name</label>
+    <input class="form-control app-control{% if errors.food_name %} is-invalid{% endif %}" id="food_name" name="food_name" maxlength="120" value="{{ v.food_name or '' }}" {% if errors.food_name %}aria-invalid="true" aria-describedby="food_name_error"{% endif %}>
+    {% if errors.food_name %}<div class="invalid-feedback" id="food_name_error">{{ errors.food_name }}</div>{% endif %}
+  </div>
+  <div class="col-md-6">
+    <label class="form-label" for="category">Meal category</label>
+    <select class="form-select app-control{% if errors.category %} is-invalid{% endif %}" id="category" name="category" {% if errors.category %}aria-invalid="true" aria-describedby="category_error"{% endif %}>
+      <option value="">Choose...</option>
+      {% for category in ['Breakfast', 'Lunch', 'Dinner', 'Snacks'] %}
+        <option value="{{ category }}" {% if v.category == category %}selected{% endif %}>{{ category }}</option>
+      {% endfor %}
+    </select>
+    {% if errors.category %}<div class="invalid-feedback" id="category_error">{{ errors.category }}</div>{% endif %}
+  </div>
+  <div class="col-md-4"><label class="form-label" for="calories">Calories (kcal)</label><input class="form-control app-control{% if errors.calories %} is-invalid{% endif %}" id="calories" name="calories" value="{{ v.calories or '' }}" {% if errors.calories %}aria-invalid="true" aria-describedby="calories_error"{% endif %}>{% if errors.calories %}<div class="invalid-feedback" id="calories_error">{{ errors.calories }}</div>{% endif %}</div>
+  <div class="col-md-4"><label class="form-label" for="protein">Protein (g)</label><input class="form-control app-control{% if errors.protein %} is-invalid{% endif %}" id="protein" name="protein" value="{{ v.protein or '' }}" {% if errors.protein %}aria-invalid="true" aria-describedby="protein_error"{% endif %}>{% if errors.protein %}<div class="invalid-feedback" id="protein_error">{{ errors.protein }}</div>{% endif %}</div>
+  <div class="col-md-4"><label class="form-label" for="meal_date">Date</label><input class="form-control app-control{% if errors.meal_date %} is-invalid{% endif %}" type="date" id="meal_date" name="meal_date" value="{{ v.meal_date or '' }}" {% if errors.meal_date %}aria-invalid="true" aria-describedby="meal_date_error"{% endif %}>{% if errors.meal_date %}<div class="invalid-feedback" id="meal_date_error">{{ errors.meal_date }}</div>{% endif %}</div>
+  <div class="col-12 form-actions"><button class="btn app-btn-primary">Save meal</button><a class="btn app-btn-secondary" href="{{ url_for('dashboard', date=v.meal_date) }}">Cancel</a></div>
+</form>
+{% endblock %}

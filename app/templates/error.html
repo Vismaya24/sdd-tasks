@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="error-state" role="alert">
+  <div class="empty-state-icon" aria-hidden="true">🌿</div>
+  <h1 class="page-title">Something needs attention</h1>
+  <p>{{ message }}</p>
+  <a class="btn app-btn-primary" href="{{ url_for('dashboard') }}">Return to dashboard</a>
+</section>
+{% endblock %}

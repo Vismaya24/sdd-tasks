@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="dashboard-heading d-flex justify-content-between align-items-center">
+  <div>
+    <p class="section-eyebrow mb-1">Daily overview</p>
+    <h1 class="page-title mb-0">Nutrition dashboard</h1>
+  </div>
+  <a class="btn app-btn-primary" href="{{ url_for('new_meal', date=meal_date) }}">
+    <span aria-hidden="true">+</span> Add meal
+  </a>
+</div>
+<form class="date-picker row g-2 align-items-end" method="get" action="{{ url_for('dashboard') }}">
+  <div class="col-sm-auto">
+    <label class="form-label" for="date">View date</label>
+    <input class="form-control app-control" id="date" type="date" name="date" value="{{ meal_date }}">
+  </div>
+  <div class="col-sm-auto"><button class="btn app-btn-secondary">View day</button></div>
+</form>
+<div class="row g-3 nutrition-summary">
+  <div class="col-md-6">
+    <section class="card nutrition-card calorie-card">
+      <div class="card-body">
+        <div class="nutrition-card-heading"><span class="nutrition-icon" aria-hidden="true">🔥</span><h2>Calories</h2></div>
+        <p class="nutrition-total">{{ calories }} <span>kcal</span></p>
+        {% if targets %}
+          {% set status, amount, percentage = calorie_progress %}
+          {% set fill = 100 if percentage > 100 else percentage %}
+          <div class="progress app-progress status-{{ status|lower|replace(' ', '-') }}" role="progressbar" aria-label="Calorie target progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ format_value(fill) }}">
+            <div class="progress-bar" style="width: {{ format_value(fill) }}%"></div>
+          </div>
+          <div class="progress-meta"><strong>{{ status }}</strong><span>{{ format_value(amount) }} kcal · {{ format_value(percentage) }}%</span></div>
+        {% else %}
+          <div class="target-empty">Targets not set. Set targets to see calorie progress.</div>
+        {% endif %}
+      </div>
+    </section>
+  </div>
+  <div class="col-md-6">
+    <section class="card nutrition-card protein-card">
+      <div class="card-body">
+        <div class="nutrition-card-heading"><span class="nutrition-icon" aria-hidden="true">💪</span><h2>Protein</h2></div>
+        <p class="nutrition-total">{{ protein }} <span>g</span></p>
+        {% if targets %}
+          {% set status, amount, percentage = protein_progress %}
+          {% set fill = 100 if percentage > 100 else percentage %}
+          <div class="progress app-progress status-{{ status|lower|replace(' ', '-') }}" role="progressbar" aria-label="Protein target progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ format_value(fill) }}">
+            <div class="progress-bar" style="width: {{ format_value(fill) }}%"></div>
+          </div>
+          <div class="progress-meta"><strong>{{ status }}</strong><span>{{ format_value(amount) }} g · {{ format_value(percentage) }}%</span></div>
+        {% else %}
+          <div class="target-empty">Targets not set. Set targets to see protein progress.</div>
+        {% endif %}
+      </div>
+    </section>
+  </div>
+</div>
+<section class="meals-section" aria-labelledby="meals-heading">
+  <div class="section-heading"><div><p class="section-eyebrow mb-1">Recorded intake</p><h2 id="meals-heading" class="h4 mb-0">Meals</h2></div></div>
+{% if meals %}
+<div class="table-responsive meal-table-wrap"><table class="table meal-table align-middle">
+  <thead><tr><th>Meal</th><th>Category</th><th>Calories</th><th>Protein</th><th>Actions</th></tr></thead>
+  <tbody>
+  {% for meal in meals %}
+    <tr>
+      <td class="meal-name">{{ meal.food_name }}</td>
+      <td><span class="category-badge">{% if meal.category == 'Breakfast' %}<span aria-hidden="true">☀️</span>{% elif meal.category == 'Lunch' %}<span aria-hidden="true">🥗</span>{% elif meal.category == 'Dinner' %}<span aria-hidden="true">🌙</span>{% else %}<span aria-hidden="true">🍎</span>{% endif %}<span>{{ meal.category }}</span></span></td>
+      <td><strong>{{ format_value(meal.calories) }}</strong> kcal</td><td><strong>{{ format_value(meal.protein) }}</strong> g</td>
+      <td><a class="btn btn-sm btn-outline-primary" href="{{ url_for('edit_meal', meal_id=meal.id) }}">Edit</a>
+        <form class="d-inline" method="post" action="{{ url_for('delete_meal_route', meal_id=meal.id) }}" onsubmit="return confirm('Delete this meal?')">
+          <button class="btn btn-sm btn-outline-danger">Delete</button>
+        </form></td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table></div>
+<div class="meal-cards">
+  {% for meal in meals %}
+  <article class="meal-card">
+    <div class="meal-card-top"><div><h3>{{ meal.food_name }}</h3><span class="category-badge">{% if meal.category == 'Breakfast' %}<span aria-hidden="true">☀️</span>{% elif meal.category == 'Lunch' %}<span aria-hidden="true">🥗</span>{% elif meal.category == 'Dinner' %}<span aria-hidden="true">🌙</span>{% else %}<span aria-hidden="true">🍎</span>{% endif %}<span>{{ meal.category }}</span></span></div></div>
+    <dl class="meal-values"><div><dt>Calories</dt><dd>{{ format_value(meal.calories) }} kcal</dd></div><div><dt>Protein</dt><dd>{{ format_value(meal.protein) }} g</dd></div></dl>
+    <div class="meal-actions"><a class="btn btn-sm btn-outline-primary" href="{{ url_for('edit_meal', meal_id=meal.id) }}">Edit</a><form method="post" action="{{ url_for('delete_meal_route', meal_id=meal.id) }}" onsubmit="return confirm('Delete this meal?')"><button class="btn btn-sm btn-outline-danger">Delete</button></form></div>
+  </article>
+  {% endfor %}
+</div>
+{% else %}
+  <div class="empty-state"><div class="empty-state-icon" aria-hidden="true">🍽️</div><h3>No meals recorded yet</h3><p>No meals recorded for this date. Daily totals are 0 kcal and 0 g protein.</p><a class="btn app-btn-primary" href="{{ url_for('new_meal', date=meal_date) }}">Add your first meal</a></div>
+{% endif %}
+</section>
+{% endblock %}
